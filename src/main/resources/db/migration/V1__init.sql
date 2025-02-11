@@ -34,3 +34,16 @@ CREATE TABLE transaction (
     KEY idx_transaction_symbol (symbol, executed_at)
 );
 
+CREATE TABLE cash_balance (
+    id     BIGINT       NOT NULL,
+    amount DECIMAL(30, 8) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE crypto_balance (
+    id       BIGINT       NOT NULL AUTO_INCREMENT,
+    symbol   VARCHAR(16)  NOT NULL,
+    quantity DECIMAL(30, 8) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_crypto_balance_symbol (symbol)
+);
