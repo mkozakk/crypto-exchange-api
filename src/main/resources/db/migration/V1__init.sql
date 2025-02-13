@@ -17,7 +17,7 @@ CREATE TABLE orders (
     remaining_quantity DECIMAL(30, 8) NOT NULL,
     status             VARCHAR(12)  NOT NULL,
     source             VARCHAR(12)  NOT NULL,
-    created_dt         DATETIME(6)  NOT NULL,
+    created_at         DATETIME(6)  NOT NULL,
     PRIMARY KEY (id),
     KEY idx_orders_book (symbol, side, status, price)
 );
