@@ -69,7 +69,7 @@ public class OrderService {
 
     private void checkFunds(PlaceOrderRequest request, Cryptocurrency crypto) {
         if (request.getSide() == OrderSide.BUY) {
-            BigDecimal unitPrice = request.getPrice();
+            BigDecimal unitPrice = request.getType() == OrderType.LIMIT ? request.getPrice() : crypto.getCurrentPrice();
             balanceService.requireCash(unitPrice.multiply(request.getQuantity()));
         }
     }
