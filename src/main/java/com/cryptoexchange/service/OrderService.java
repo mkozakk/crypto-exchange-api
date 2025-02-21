@@ -2,10 +2,12 @@ package com.cryptoexchange.service;
 
 import com.cryptoexchange.dto.PlaceOrderRequest;
 import com.cryptoexchange.exception.InvalidOrderException;
+import com.cryptoexchange.exception.NotFoundException;
 import com.cryptoexchange.model.Cryptocurrency;
 import com.cryptoexchange.model.Order;
 import com.cryptoexchange.model.OrderSide;
 import com.cryptoexchange.model.OrderSource;
+import com.cryptoexchange.model.OrderStatus;
 import com.cryptoexchange.model.OrderType;
 import com.cryptoexchange.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,18 @@ public class OrderService {
         Order order = new Order(crypto.getSymbol(), request.getSide(), request.getType(),
                 price, request.getQuantity(), source);
         return orderRepository.save(order);
+    }
+
+    @Transactional
+    public Order cancelOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order not found: " + id));
+        if (!order.isActive()) {
+            throw new InvalidOrderException("Order " + id + " is not open and cannot be cancelled");
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+        return order;
     }
 
     private void validate(PlaceOrderRequest request) {
