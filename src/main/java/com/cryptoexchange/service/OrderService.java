@@ -1,6 +1,7 @@
 package com.cryptoexchange.service;
 
 import com.cryptoexchange.dto.PlaceOrderRequest;
+import com.cryptoexchange.event.OrderBookChangedEvent;
 import com.cryptoexchange.exception.InvalidOrderException;
 import com.cryptoexchange.exception.NotFoundException;
 import com.cryptoexchange.model.Cryptocurrency;
@@ -10,6 +11,7 @@ import com.cryptoexchange.model.OrderSource;
 import com.cryptoexchange.model.OrderStatus;
 import com.cryptoexchange.model.OrderType;
 import com.cryptoexchange.repository.OrderRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +23,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CryptocurrencyService cryptocurrencyService;
     private final BalanceService balanceService;
+    private final MatchingEngine matchingEngine;
+    private final ApplicationEventPublisher events;
 
     public OrderService(OrderRepository orderRepository,
                         CryptocurrencyService cryptocurrencyService,
-                        BalanceService balanceService) {
+                        BalanceService balanceService,
+                        MatchingEngine matchingEngine,
+                        ApplicationEventPublisher events) {
         this.orderRepository = orderRepository;
         this.cryptocurrencyService = cryptocurrencyService;
         this.balanceService = balanceService;
+        this.matchingEngine = matchingEngine;
+        this.events = events;
     }
 
     @Transactional
@@ -42,7 +50,10 @@ public class OrderService {
         BigDecimal price = request.getType() == OrderType.LIMIT ? request.getPrice() : null;
         Order order = new Order(crypto.getSymbol(), request.getSide(), request.getType(),
                 price, request.getQuantity(), source);
-        return orderRepository.save(order);
+        order = orderRepository.save(order);
+
+        matchingEngine.match(order);
+        return order;
     }
 
     @Transactional
@@ -54,6 +65,7 @@ public class OrderService {
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+        events.publishEvent(new OrderBookChangedEvent(order.getSymbol()));
         return order;
     }
 
@@ -69,7 +81,8 @@ public class OrderService {
 
     private void checkFunds(PlaceOrderRequest request, Cryptocurrency crypto) {
         if (request.getSide() == OrderSide.BUY) {
-            BigDecimal unitPrice = request.getType() == OrderType.LIMIT ? request.getPrice() : crypto.getCurrentPrice();
+            BigDecimal unitPrice = request.getType() == OrderType.LIMIT
+                    ? request.getPrice() : crypto.getCurrentPrice();
             balanceService.requireCash(unitPrice.multiply(request.getQuantity()));
         }
     }
