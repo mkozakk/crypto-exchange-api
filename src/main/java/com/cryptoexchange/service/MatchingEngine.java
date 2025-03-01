@@ -111,6 +111,8 @@ public class MatchingEngine {
     private void finalizeStatus(Order incoming) {
         if (incoming.getRemainingQuantity().signum() == 0) {
             incoming.setStatus(OrderStatus.FILLED);
+        } else if (incoming.getFilledQuantity().signum() > 0) {
+            incoming.setStatus(OrderStatus.PARTIAL);
         } else {
             incoming.setStatus(OrderStatus.OPEN);
         }
