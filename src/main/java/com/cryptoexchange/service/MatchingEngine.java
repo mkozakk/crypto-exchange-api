@@ -1,6 +1,7 @@
 package com.cryptoexchange.service;
 
 import com.cryptoexchange.event.OrderBookChangedEvent;
+import com.cryptoexchange.exception.InsufficientLiquidityException;
 import com.cryptoexchange.model.Order;
 import com.cryptoexchange.model.OrderSide;
 import com.cryptoexchange.model.OrderSource;
@@ -41,6 +42,10 @@ public class MatchingEngine {
                 ? orderBookService.activeAsks(incoming.getSymbol())
                 : orderBookService.activeBids(incoming.getSymbol());
 
+        if (incoming.getType() == OrderType.MARKET) {
+            requireLiquidity(incoming, restingOrders);
+        }
+
         for (Order resting : restingOrders) {
             if (incoming.getRemainingQuantity().signum() == 0) {
                 break;
@@ -54,6 +59,16 @@ public class MatchingEngine {
         finalizeStatus(incoming);
         orderRepository.save(incoming);
         events.publishEvent(new OrderBookChangedEvent(incoming.getSymbol()));
+    }
+
+    private void requireLiquidity(Order incoming, List<Order> restingOrders) {
+        BigDecimal available = restingOrders.stream()
+                .map(Order::getRemainingQuantity)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (available.compareTo(incoming.getQuantity()) < 0) {
+            throw new InsufficientLiquidityException(
+                    "Not enough liquidity to fill market order for " + incoming.getSymbol());
+        }
     }
 
     private boolean crosses(Order incoming, Order resting) {
