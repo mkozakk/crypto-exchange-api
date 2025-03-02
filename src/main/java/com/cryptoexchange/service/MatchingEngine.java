@@ -7,7 +7,9 @@ import com.cryptoexchange.model.OrderSide;
 import com.cryptoexchange.model.OrderSource;
 import com.cryptoexchange.model.OrderStatus;
 import com.cryptoexchange.model.OrderType;
+import com.cryptoexchange.model.Transaction;
 import com.cryptoexchange.repository.OrderRepository;
+import com.cryptoexchange.repository.TransactionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,17 +21,20 @@ import java.util.List;
 public class MatchingEngine {
 
     private final OrderRepository orderRepository;
+    private final TransactionRepository transactionRepository;
     private final OrderBookService orderBookService;
     private final BalanceService balanceService;
     private final CryptocurrencyService cryptocurrencyService;
     private final ApplicationEventPublisher events;
 
     public MatchingEngine(OrderRepository orderRepository,
+                          TransactionRepository transactionRepository,
                           OrderBookService orderBookService,
                           BalanceService balanceService,
                           CryptocurrencyService cryptocurrencyService,
                           ApplicationEventPublisher events) {
         this.orderRepository = orderRepository;
+        this.transactionRepository = transactionRepository;
         this.orderBookService = orderBookService;
         this.balanceService = balanceService;
         this.cryptocurrencyService = cryptocurrencyService;
@@ -94,6 +99,9 @@ public class MatchingEngine {
 
         Order buyOrder = incoming.getSide() == OrderSide.BUY ? incoming : resting;
         Order sellOrder = incoming.getSide() == OrderSide.BUY ? resting : incoming;
+
+        transactionRepository.save(new Transaction(
+                incoming.getSymbol(), buyOrder.getId(), sellOrder.getId(), tradePrice, tradeQty));
 
         settle(buyOrder, sellOrder, value, tradeQty);
         cryptocurrencyService.updatePrice(incoming.getSymbol(), tradePrice);
