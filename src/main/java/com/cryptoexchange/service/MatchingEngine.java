@@ -83,7 +83,7 @@ public class MatchingEngine {
         if (incoming.getSide() == OrderSide.BUY) {
             return resting.getPrice().compareTo(incoming.getPrice()) <= 0;
         }
-        return resting.getPrice().compareTo(incoming.getPrice()) < 0;
+        return resting.getPrice().compareTo(incoming.getPrice()) >= 0;
     }
 
     private void executeTrade(Order incoming, Order resting) {
