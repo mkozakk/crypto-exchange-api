@@ -59,7 +59,7 @@ public class SimulationService {
     }
 
     private BigDecimal movePrice(Cryptocurrency coin) {
-        double drift = random.nextGaussian() * VOLATILITY;
+        double drift = random.nextGaussian() * VOLATILITY + imbalance(coin.getSymbol()) * IMBALANCE_BIAS;
         BigDecimal factor = BigDecimal.valueOf(1 + drift);
         BigDecimal newPrice = coin.getCurrentPrice().multiply(factor).setScale(8, RoundingMode.HALF_UP);
         if (newPrice.signum() <= 0) {
