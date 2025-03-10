@@ -54,6 +54,7 @@ public class SimulationService {
         }
         for (Cryptocurrency coin : cryptocurrencyService.findAll()) {
             BigDecimal reference = movePrice(coin);
+            generateOrders(coin.getSymbol(), reference);
         }
     }
 
