@@ -29,7 +29,7 @@ public class SimulationService {
     private static final double VOLATILITY = 0.002;
     private static final double IMBALANCE_BIAS = 0.0015;
     private static final double SPREAD = 0.01;
-    private static final int ORDERS_PER_TICK = 3;
+    private static final int ORDERS_PER_TICK = 4;
 
     private final CryptocurrencyService cryptocurrencyService;
     private final OrderBookService orderBookService;
