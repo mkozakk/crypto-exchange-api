@@ -34,6 +34,20 @@ public class BalanceService {
                 .orElse(BigDecimal.ZERO);
     }
 
+    @Transactional
+    public void depositCash(BigDecimal amount) {
+        CashBalance wallet = cashWallet();
+        wallet.setAmount(wallet.getAmount().add(amount));
+    }
+
+    @Transactional
+    public void withdrawCash(BigDecimal amount) {
+        CashBalance wallet = cashWallet();
+        if (wallet.getAmount().compareTo(amount) < 0) {
+            throw new InsufficientFundsException("Not enough cash to withdraw " + amount);
+        }
+    }
+
     public void requireCash(BigDecimal amount) {
         if (getCash().compareTo(amount) < 0) {
             throw new InsufficientFundsException("Not enough cash, need " + amount);
