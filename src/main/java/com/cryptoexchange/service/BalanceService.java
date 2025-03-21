@@ -1,5 +1,6 @@
 package com.cryptoexchange.service;
 
+import com.cryptoexchange.dto.CryptoHolding;
 import com.cryptoexchange.exception.InsufficientFundsException;
 import com.cryptoexchange.model.CashBalance;
 import com.cryptoexchange.model.CryptoBalance;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class BalanceService {
@@ -25,6 +27,13 @@ public class BalanceService {
     @Transactional(readOnly = true)
     public BigDecimal getCash() {
         return cashWallet().getAmount();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CryptoHolding> getHoldings() {
+        return cryptoBalanceRepository.findAll().stream()
+                .map(h -> new CryptoHolding(h.getSymbol(), h.getQuantity()))
+                .toList();
     }
 
     @Transactional(readOnly = true)
