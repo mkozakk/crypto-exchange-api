@@ -8,7 +8,6 @@ import com.cryptoexchange.model.Cryptocurrency;
 import com.cryptoexchange.model.Order;
 import com.cryptoexchange.model.OrderSide;
 import com.cryptoexchange.model.OrderSource;
-import com.cryptoexchange.model.OrderStatus;
 import com.cryptoexchange.model.OrderType;
 import com.cryptoexchange.repository.OrderRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -63,7 +62,7 @@ public class OrderService {
         if (!order.isActive()) {
             throw new InvalidOrderException("Order " + id + " is not open and cannot be cancelled");
         }
-        order.setStatus(OrderStatus.CANCELLED);
+        order.setStatus(com.cryptoexchange.model.OrderStatus.CANCELLED);
         orderRepository.save(order);
         events.publishEvent(new OrderBookChangedEvent(order.getSymbol()));
         return order;
@@ -84,6 +83,8 @@ public class OrderService {
             BigDecimal unitPrice = request.getType() == OrderType.LIMIT
                     ? request.getPrice() : crypto.getCurrentPrice();
             balanceService.requireCash(unitPrice.multiply(request.getQuantity()));
+        } else {
+            balanceService.requireCrypto(crypto.getSymbol(), request.getQuantity());
         }
     }
 }
