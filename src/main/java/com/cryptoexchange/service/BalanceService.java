@@ -55,6 +55,7 @@ public class BalanceService {
         if (wallet.getAmount().compareTo(amount) < 0) {
             throw new InsufficientFundsException("Not enough cash to withdraw " + amount);
         }
+        wallet.setAmount(wallet.getAmount().subtract(amount));
     }
 
     public void requireCash(BigDecimal amount) {
