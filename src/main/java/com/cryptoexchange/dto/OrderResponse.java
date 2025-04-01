@@ -17,7 +17,7 @@ public record OrderResponse(
         BigDecimal price,
         BigDecimal quantity,
         BigDecimal remainingQuantity,
-        BigDecimal filled,
+        BigDecimal filledQuantity,
         OrderStatus status,
         OrderSource source,
         Instant createdAt) {
