@@ -23,7 +23,7 @@ public class MarketSocketPublisher {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onPriceUpdated(PriceUpdatedEvent event) {
-        messagingTemplate.convertAndSend("/topic/price",
+        messagingTemplate.convertAndSend("/topic/prices",
                 new PriceTick(event.symbol(), event.price()));
     }
 
