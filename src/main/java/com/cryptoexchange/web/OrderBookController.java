@@ -1,5 +1,6 @@
 package com.cryptoexchange.web;
 
+import com.cryptoexchange.cache.MarketCache;
 import com.cryptoexchange.dto.OrderBookResponse;
 import com.cryptoexchange.service.CryptocurrencyService;
 import com.cryptoexchange.service.OrderBookService;
@@ -17,17 +18,21 @@ public class OrderBookController {
 
     private final OrderBookService orderBookService;
     private final CryptocurrencyService cryptocurrencyService;
+    private final MarketCache marketCache;
 
     public OrderBookController(OrderBookService orderBookService,
-                              CryptocurrencyService cryptocurrencyService) {
+                              CryptocurrencyService cryptocurrencyService,
+                              MarketCache marketCache) {
         this.orderBookService = orderBookService;
         this.cryptocurrencyService = cryptocurrencyService;
+        this.marketCache = marketCache;
     }
 
     @Operation(summary = "Get the bids and asks for a symbol")
     @GetMapping("/{symbol}")
     public OrderBookResponse get(@PathVariable String symbol) {
         cryptocurrencyService.getBySymbol(symbol);
-        return orderBookService.snapshot(symbol);
+        return marketCache.cachedOrderBook(symbol)
+                .orElseGet(() -> orderBookService.snapshot(symbol));
     }
 }
