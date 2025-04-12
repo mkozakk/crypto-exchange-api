@@ -1,0 +1,206 @@
+:root {
+  --bg: #0e1117;
+  --card: #161b22;
+  --border: #2a3038;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --green: #2ea043;
+  --red: #f85149;
+  --accent: #1f6feb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+.ticker {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.ticker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  min-width: 110px;
+}
+
+.ticker-item.active {
+  border-color: var(--accent);
+}
+
+.ticker-symbol {
+  font-weight: 600;
+}
+
+.ticker-price {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+}
+
+.orderbook {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.bid td:first-child {
+  color: var(--green);
+}
+
+.ask td:first-child {
+  color: var(--red);
+}
+
+.toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.toggle button {
+  flex: 1;
+  padding: 0.4rem;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toggle button.active {
+  border-color: var(--accent);
+}
+
+.toggle button.buy.active {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.toggle button.sell.active {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+input {
+  padding: 0.4rem;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.submit {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit.buy {
+  background: var(--green);
+}
+
+.submit.sell {
+  background: var(--red);
+}
+
+.error {
+  color: var(--red);
+  font-size: 0.8rem;
+}
+
+.cash {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.cash-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.cash-actions button {
+  padding: 0.4rem 0.7rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
